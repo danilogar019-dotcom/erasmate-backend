@@ -1,6 +1,10 @@
 package com.erasmate.erasmate_backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "categoria")
@@ -16,6 +20,11 @@ public class Categoria {
 
     @Column(length = 255)
     private String descripcion;
+
+    // Una categoría agrupa muchos lugares
+    @OneToMany(mappedBy = "categoria")
+    @JsonIgnore
+    private List<Lugar> lugares = new ArrayList<>();
 
     // Constructor vacío: obligatorio para JPA
     public Categoria() {
@@ -34,4 +43,7 @@ public class Categoria {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public List<Lugar> getLugares() { return lugares; }
+    public void setLugares(List<Lugar> lugares) { this.lugares = lugares; }
 }
