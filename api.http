@@ -24,3 +24,33 @@ DELETE http://localhost:8081/api/ciudades/{{idCiudad}}
 
 ### Comprobar que ya no existe (debe dar 404)
 GET http://localhost:8081/api/ciudades/{{idCiudad}}
+
+###############################################
+# CATEGORÍAS
+###############################################
+
+### Crear categoría
+POST http://localhost:8081/api/categorias
+Content-Type: application/json
+
+{"nombre": "Restaurantes", "descripcion": "Sitios para comer"}
+
+> {% client.global.set("idCategoria", response.body.idCategoria); %}
+
+### Listar categorías
+GET http://localhost:8081/api/categorias
+
+### Obtener la categoría creada
+GET http://localhost:8081/api/categorias/{{idCategoria}}
+
+### Modificar la categoría creada
+PUT http://localhost:8081/api/categorias/{{idCategoria}}
+Content-Type: application/json
+
+{"nombre": "Restaurantes", "descripcion": "Sitios para comer y cenar"}
+
+### Borrar la categoría creada
+DELETE http://localhost:8081/api/categorias/{{idCategoria}}
+
+### Comprobar que ya no existe (debe dar 404)
+GET http://localhost:8081/api/categorias/{{idCategoria}}
