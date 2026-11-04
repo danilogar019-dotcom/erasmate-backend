@@ -54,3 +54,80 @@ DELETE http://localhost:8081/api/categorias/{{idCategoria}}
 
 ### Comprobar que ya no existe (debe dar 404)
 GET http://localhost:8081/api/categorias/{{idCategoria}}
+
+###############################################
+# LUGARES (necesita una ciudad y una categoría)
+###############################################
+
+### Preparación: crear ciudad para los lugares
+POST http://localhost:8081/api/ciudades
+Content-Type: application/json
+
+{"nombre": "Roma", "pais": "Italia"}
+
+> {% client.global.set("idCiudad", response.body.idCiudad); %}
+
+### Preparación: crear categoría para los lugares
+POST http://localhost:8081/api/categorias
+Content-Type: application/json
+
+{"nombre": "Ocio", "descripcion": "Planes y actividades"}
+
+> {% client.global.set("idCategoria", response.body.idCategoria); %}
+
+### Crear lugar
+POST http://localhost:8081/api/lugares
+Content-Type: application/json
+
+{
+  "nombre": "Coliseo",
+  "descripcion": "Anfiteatro romano",
+  "precioAprox": 18.0,
+  "ciudad": {"idCiudad": {{idCiudad}}},
+  "categoria": {"idCategoria": {{idCategoria}}}
+}
+
+> {% client.global.set("idLugar", response.body.idLugar); %}
+
+### Crear lugar con una ciudad que no existe (debe dar 400)
+POST http://localhost:8081/api/lugares
+Content-Type: application/json
+
+{
+  "nombre": "Lugar erróneo",
+  "ciudad": {"idCiudad": 99999},
+  "categoria": {"idCategoria": {{idCategoria}}}
+}
+
+### Listar todos los lugares
+GET http://localhost:8081/api/lugares
+
+### Filtrar lugares por ciudad
+GET http://localhost:8081/api/lugares?ciudad={{idCiudad}}
+
+### Filtrar lugares por categoría
+GET http://localhost:8081/api/lugares?categoria={{idCategoria}}
+
+### Obtener el lugar creado
+GET http://localhost:8081/api/lugares/{{idLugar}}
+
+### Modificar el lugar creado
+PUT http://localhost:8081/api/lugares/{{idLugar}}
+Content-Type: application/json
+
+{
+  "nombre": "Coliseo",
+  "descripcion": "Anfiteatro romano del siglo I",
+  "precioAprox": 22.0,
+  "ciudad": {"idCiudad": {{idCiudad}}},
+  "categoria": {"idCategoria": {{idCategoria}}}
+}
+
+### Intentar borrar la ciudad con lugares (debe dar 409)
+DELETE http://localhost:8081/api/ciudades/{{idCiudad}}
+
+### Borrar el lugar creado
+DELETE http://localhost:8081/api/lugares/{{idLugar}}
+
+### Comprobar que ya no existe (debe dar 404)
+GET http://localhost:8081/api/lugares/{{idLugar}}
