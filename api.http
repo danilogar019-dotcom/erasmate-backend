@@ -1,0 +1,26 @@
+### Crear ciudad
+# Guarda el id que devuelve la API en la variable {{idCiudad}}
+POST http://localhost:8081/api/ciudades
+Content-Type: application/json
+
+{"nombre": "Lisboa", "pais": "Portugal"}
+
+> {% client.global.set("idCiudad", response.body.idCiudad); %}
+
+### Listar ciudades
+GET http://localhost:8081/api/ciudades
+
+### Obtener la ciudad creada
+GET http://localhost:8081/api/ciudades/{{idCiudad}}
+
+### Modificar la ciudad creada
+PUT http://localhost:8081/api/ciudades/{{idCiudad}}
+Content-Type: application/json
+
+{"nombre": "Lisboa", "pais": "Portugal (PT)"}
+
+### Borrar la ciudad creada
+DELETE http://localhost:8081/api/ciudades/{{idCiudad}}
+
+### Comprobar que ya no existe (debe dar 404)
+GET http://localhost:8081/api/ciudades/{{idCiudad}}
