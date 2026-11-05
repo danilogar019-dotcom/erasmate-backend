@@ -29,47 +29,49 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
-        // ---------- Ciudades ----------
-        Ciudad lisboa = ciudadRepository.save(new Ciudad("Lisboa", "Portugal"));
-        Ciudad roma   = ciudadRepository.save(new Ciudad("Roma", "Italia"));
-        Ciudad paris  = ciudadRepository.save(new Ciudad("París", "Francia"));
-        Ciudad berlin = ciudadRepository.save(new Ciudad("Berlín", "Alemania"));
+        // ---------- Ciudades (Canarias) ----------
+        Ciudad lasPalmas = ciudadRepository.save(new Ciudad("Las Palmas de Gran Canaria", "España"));
+        Ciudad santaCruz = ciudadRepository.save(new Ciudad("Santa Cruz de Tenerife", "España"));
+        Ciudad laLaguna  = ciudadRepository.save(new Ciudad("San Cristóbal de La Laguna", "España"));
+        Ciudad puerto    = ciudadRepository.save(new Ciudad("Puerto de la Cruz", "España"));
 
-        // ---------- Categorías ----------
-        Categoria restaurantes = categoriaRepository.save(new Categoria("Restaurantes", "Sitios para comer y cenar"));
-        Categoria ocio         = categoriaRepository.save(new Categoria("Ocio", "Planes, actividades y vida nocturna"));
-        Categoria museos       = categoriaRepository.save(new Categoria("Museos", "Arte, historia y cultura"));
-        Categoria transporte   = categoriaRepository.save(new Categoria("Transporte", "Cómo moverse por la ciudad"));
+        // ---------- Categorías (alineadas con las secciones de la app) ----------
         Categoria tramites     = categoriaRepository.save(new Categoria("Trámites", "Gestiones para estudiantes Erasmus"));
+        Categoria transporte   = categoriaRepository.save(new Categoria("Transporte", "Cómo moverse por la isla"));
+        Categoria ocio         = categoriaRepository.save(new Categoria("Ocio", "Planes y actividades para el tiempo libre"));
+        Categoria playas       = categoriaRepository.save(new Categoria("Playas", "Playas y zonas de baño"));
+        Categoria restaurantes = categoriaRepository.save(new Categoria("Restaurantes", "Sitios para comer y cenar"));
 
-        // ---------- Lugares (precios aproximados en euros) ----------
-        // Lisboa
-        Lugar timeOut = lugarRepository.save(new Lugar("Time Out Market", "Mercado gastronómico con puestos de cocina portuguesa", 15.0, lisboa, restaurantes));
-        lugarRepository.save(new Lugar("Torre de Belém", "Torre defensiva del siglo XVI junto al río Tajo", 10.0, lisboa, museos));
-        lugarRepository.save(new Lugar("Tarjeta Viva Viagem", "Tarjeta recargable para metro, autobús y tranvía", 0.5, lisboa, transporte));
+        // ---------- Lugares (precios aproximados en euros; 0 = gratis) ----------
+        // Las Palmas de Gran Canaria
+        Lugar canteras = lugarRepository.save(new Lugar("Playa de Las Canteras", "Playa urbana con paseo marítimo y arrecife natural", 0.0, lasPalmas, playas));
+        lugarRepository.save(new Lugar("Guaguas Municipales", "Autobuses urbanos de la ciudad; precio aproximado del billete sencillo", 1.4, lasPalmas, transporte));
+        Lugar oriUlpgc = lugarRepository.save(new Lugar("Oficina de Relaciones Internacionales ULPGC", "Atención a estudiantes de intercambio de la Universidad de Las Palmas", 0.0, lasPalmas, tramites));
+        lugarRepository.save(new Lugar("Mercado del Puerto", "Mercado con puestos de comida y tapas", 12.0, lasPalmas, restaurantes));
 
-        // Roma
-        Lugar coliseo = lugarRepository.save(new Lugar("Coliseo", "Anfiteatro romano, símbolo de la ciudad", 18.0, roma, museos));
-        lugarRepository.save(new Lugar("Trastevere", "Barrio con ambiente para salir por la noche", 0.0, roma, ocio));
-        lugarRepository.save(new Lugar("Oficina de Relaciones Internacionales", "Punto de atención para estudiantes de intercambio", 0.0, roma, tramites));
+        // Santa Cruz de Tenerife
+        Lugar teresitas = lugarRepository.save(new Lugar("Playa de Las Teresitas", "Playa de arena dorada junto a San Andrés", 0.0, santaCruz, playas));
+        lugarRepository.save(new Lugar("Tranvía de Tenerife", "Une Santa Cruz con La Laguna; precio aproximado del billete", 1.35, santaCruz, transporte));
+        lugarRepository.save(new Lugar("Parque García Sanabria", "Gran parque urbano en el centro de la ciudad", 0.0, santaCruz, ocio));
 
-        // París
-        Lugar louvre = lugarRepository.save(new Lugar("Museo del Louvre", "Uno de los museos de arte más grandes del mundo", 22.0, paris, museos));
-        lugarRepository.save(new Lugar("Torre Eiffel", "Vistas de toda la ciudad desde lo alto", 29.0, paris, ocio));
-        lugarRepository.save(new Lugar("Pase Navigo", "Abono de transporte público para toda la región", 2.0, paris, transporte));
+        // San Cristóbal de La Laguna
+        lugarRepository.save(new Lugar("Oficina de Relaciones Internacionales ULL", "Atención a estudiantes de intercambio de la Universidad de La Laguna", 0.0, laLaguna, tramites));
+        lugarRepository.save(new Lugar("Casco histórico de La Laguna", "Centro histórico Patrimonio de la Humanidad, ideal para pasear", 0.0, laLaguna, ocio));
+        lugarRepository.save(new Lugar("Mercado Municipal de La Laguna", "Mercado con productos locales y zona de comidas", 8.0, laLaguna, restaurantes));
 
-        // Berlín
-        lugarRepository.save(new Lugar("East Side Gallery", "Tramo del Muro de Berlín cubierto de murales", 0.0, berlin, ocio));
-        lugarRepository.save(new Lugar("Isla de los Museos", "Conjunto de cinco museos en el centro de la ciudad", 24.0, berlin, museos));
-        lugarRepository.save(new Lugar("Markthalle Neun", "Mercado cubierto con comida de todo el mundo", 12.0, berlin, restaurantes));
+        // Puerto de la Cruz
+        lugarRepository.save(new Lugar("Playa Jardín", "Playa de arena negra con jardines", 0.0, puerto, playas));
+        lugarRepository.save(new Lugar("Lago Martiánez", "Complejo de piscinas de agua salada junto al mar", 6.0, puerto, ocio));
+        lugarRepository.save(new Lugar("Loro Parque", "Parque zoológico y de animales marinos", 40.0, puerto, ocio));
 
         // ---------- Usuario de demostración con favoritos (relación N:M) ----------
-        Usuario demo = new Usuario("Usuario Demo", "demo@erasmate.com", "1234");
-        demo.addFavorito(timeOut);
-        demo.addFavorito(coliseo);
-        demo.addFavorito(louvre);
+        // Contraseña de 8+ caracteres para cumplir la validación del registro del frontend
+        Usuario demo = new Usuario("Usuario Demo", "demo@erasmate.com", "erasmate2026");
+        demo.addFavorito(canteras);
+        demo.addFavorito(teresitas);
+        demo.addFavorito(oriUlpgc);
         usuarioRepository.save(demo);
 
-        System.out.println(">>> Datos de prueba cargados: 4 ciudades, 5 categorías, 12 lugares y 1 usuario demo");
+        System.out.println(">>> Datos de prueba cargados: 4 ciudades, 5 categorías, 13 lugares y 1 usuario demo");
     }
 }
