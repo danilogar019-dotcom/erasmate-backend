@@ -59,4 +59,18 @@ public class Lugar {
 
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+
+    // Dos lugares son iguales si tienen el mismo id (el de la base de datos).
+    // Necesario para que el Set de favoritos de Usuario pueda encontrar y quitar un lugar.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Lugar otro)) return false;
+        return idLugar != null && idLugar.equals(otro.idLugar);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

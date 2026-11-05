@@ -131,3 +131,91 @@ DELETE http://localhost:8081/api/lugares/{{idLugar}}
 
 ### Comprobar que ya no existe (debe dar 404)
 GET http://localhost:8081/api/lugares/{{idLugar}}
+
+###############################################
+# USUARIOS: registro y login
+###############################################
+
+### Registrar usuario (email único gracias a {{$timestamp}})
+POST http://localhost:8081/api/usuarios
+Content-Type: application/json
+
+{"nombre": "Dani", "email": "dani{{$timestamp}}@erasmate.com", "password": "1234"}
+
+> {%
+    client.global.set("idUsuario", response.body.idUsuario);
+    client.global.set("emailUsuario", response.body.email);
+%}
+
+### Registrar con un email repetido (debe dar 409)
+POST http://localhost:8081/api/usuarios
+Content-Type: application/json
+
+{"nombre": "Otro", "email": "{{emailUsuario}}", "password": "abcd"}
+
+### Login correcto (debe dar 200)
+POST http://localhost:8081/api/usuarios/login
+Content-Type: application/json
+
+{"email": "{{emailUsuario}}", "password": "1234"}
+
+### Login con contraseña incorrecta (debe dar 401)
+POST http://localhost:8081/api/usuarios/login
+Content-Type: application/json
+
+{"email": "{{emailUsuario}}", "password": "mala"}
+
+### Obtener el usuario (la contraseña no debe aparecer)
+GET http://localhost:8081/api/usuarios/{{idUsuario}}
+
+###############################################
+# FAVORITOS (relación N:M) — ejecutar después de USUARIOS
+###############################################
+
+### Preparación: crear ciudad
+POST http://localhost:8081/api/ciudades
+Content-Type: application/json
+
+{"nombre": "París", "pais": "Francia"}
+
+> {% client.global.set("idCiudad", response.body.idCiudad); %}
+
+### Preparación: crear categoría
+POST http://localhost:8081/api/categorias
+Content-Type: application/json
+
+{"nombre": "Museos", "descripcion": "Arte e historia"}
+
+> {% client.global.set("idCategoria", response.body.idCategoria); %}
+
+### Preparación: crear lugar
+POST http://localhost:8081/api/lugares
+Content-Type: application/json
+
+{
+  "nombre": "Museo del Louvre",
+  "descripcion": "Museo de arte",
+  "precioAprox": 22.0,
+  "ciudad": {"idCiudad": {{idCiudad}}},
+  "categoria": {"idCategoria": {{idCategoria}}}
+}
+
+> {% client.global.set("idLugar", response.body.idLugar); %}
+
+### Añadir el lugar a favoritos del usuario
+POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+
+### Listar favoritos del usuario (debe salir el Louvre)
+GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+
+### Añadirlo otra vez (no se duplica gracias al Set y a la PK compuesta)
+POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+
+### Añadir un lugar que no existe (debe dar 404)
+POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/99999
+
+### Quitar el lugar de favoritos
+DELETE http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+
+### Comprobar que la lista vuelve a estar vacía
+GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
