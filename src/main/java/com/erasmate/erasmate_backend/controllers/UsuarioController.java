@@ -6,6 +6,7 @@ import com.erasmate.erasmate_backend.repositories.LugarRepository;
 import com.erasmate.erasmate_backend.repositories.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,10 +20,13 @@ public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
     private final LugarRepository lugarRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioRepository usuarioRepository, LugarRepository lugarRepository) {
+    public UsuarioController(UsuarioRepository usuarioRepository, LugarRepository lugarRepository,
+                             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.lugarRepository = lugarRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // POST /api/usuarios → registro (409 si el email ya está registrado)
@@ -33,6 +37,8 @@ public class UsuarioController {
                     .body(Map.of("error", "Ya existe un usuario con ese email"));
         }
         usuario.setIdUsuario(null); // el id lo genera la base de datos
+        // Se guarda el hash de la contraseña, nunca la contraseña en texto plano
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRepository.save(usuario));
     }
 
@@ -40,7 +46,7 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario datos) {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(datos.getEmail());
-        if (usuario.isEmpty() || !usuario.get().getPassword().equals(datos.getPassword())) {
+        if (usuario.isEmpty() || !passwordEncoder.matches(datos.getPassword(), usuario.get().getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Email o contraseña incorrectos"));
         }

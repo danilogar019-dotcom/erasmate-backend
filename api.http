@@ -165,6 +165,12 @@ Content-Type: application/json
 
 {"email": "{{emailUsuario}}", "password": "mala"}
 
+### Login con el usuario demo de los datos de prueba (debe dar 200 y traer sus 3 favoritos)
+POST http://localhost:8081/api/usuarios/login
+Content-Type: application/json
+
+{"email": "demo@erasmate.com", "password": "erasmate2026"}
+
 ### Obtener el usuario (la contraseña no debe aparecer)
 GET http://localhost:8081/api/usuarios/{{idUsuario}}
 

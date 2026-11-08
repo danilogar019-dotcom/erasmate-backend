@@ -2,6 +2,8 @@ package com.erasmate.erasmate_backend.models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "lugar")
 public class Lugar {
@@ -17,8 +19,9 @@ public class Lugar {
     @Column(length = 500)
     private String descripcion;
 
-    @Column(name = "precio_aprox")
-    private Double precioAprox;
+    // DECIMAL(10,2): guarda los céntimos de forma exacta (Double puede dar errores de redondeo)
+    @Column(name = "precio_aprox", precision = 10, scale = 2)
+    private BigDecimal precioAprox;
 
     // Muchos lugares pertenecen a una ciudad
     @ManyToOne
@@ -34,7 +37,7 @@ public class Lugar {
     public Lugar() {
     }
 
-    public Lugar(String nombre, String descripcion, Double precioAprox, Ciudad ciudad, Categoria categoria) {
+    public Lugar(String nombre, String descripcion, BigDecimal precioAprox, Ciudad ciudad, Categoria categoria) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precioAprox = precioAprox;
@@ -51,8 +54,8 @@ public class Lugar {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public Double getPrecioAprox() { return precioAprox; }
-    public void setPrecioAprox(Double precioAprox) { this.precioAprox = precioAprox; }
+    public BigDecimal getPrecioAprox() { return precioAprox; }
+    public void setPrecioAprox(BigDecimal precioAprox) { this.precioAprox = precioAprox; }
 
     public Ciudad getCiudad() { return ciudad; }
     public void setCiudad(Ciudad ciudad) { this.ciudad = ciudad; }

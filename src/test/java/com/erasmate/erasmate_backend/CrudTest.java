@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -28,7 +30,7 @@ class CrudTest {
         Ciudad ciudad = ciudadRepository.save(new Ciudad("Lisboa", "Portugal"));
         Categoria categoria = categoriaRepository.save(new Categoria("Restaurantes", "Sitios para comer"));
         Lugar lugar = lugarRepository.save(
-                new Lugar("Time Out Market", "Mercado gastronómico", 15.0, ciudad, categoria));
+                new Lugar("Time Out Market", "Mercado gastronómico", new BigDecimal("15.00"), ciudad, categoria));
 
         assertNotNull(lugar.getIdLugar(), "El lugar debería tener id tras guardarse");
 
@@ -39,9 +41,11 @@ class CrudTest {
         assertEquals("Restaurantes", leido.getCategoria().getNombre()); // relación 1:N con Categoria
 
         // ---------- UPDATE ----------
-        leido.setPrecioAprox(20.0);
+        leido.setPrecioAprox(new BigDecimal("20.00"));
         lugarRepository.save(leido);
-        assertEquals(20.0, lugarRepository.findById(lugar.getIdLugar()).orElseThrow().getPrecioAprox());
+        // compareTo: compara el valor numérico (20.0 y 20.00 son iguales)
+        assertEquals(0, new BigDecimal("20.00").compareTo(
+                lugarRepository.findById(lugar.getIdLugar()).orElseThrow().getPrecioAprox()));
 
         // ---------- DELETE ----------
         lugarRepository.deleteById(lugar.getIdLugar());
@@ -56,7 +60,7 @@ class CrudTest {
     void favoritosRelacionNM() {
         Ciudad ciudad = ciudadRepository.save(new Ciudad("Roma", "Italia"));
         Categoria categoria = categoriaRepository.save(new Categoria("Ocio", null));
-        Lugar lugar = lugarRepository.save(new Lugar("Coliseo", "Anfiteatro romano", 18.0, ciudad, categoria));
+        Lugar lugar = lugarRepository.save(new Lugar("Coliseo", "Anfiteatro romano", new BigDecimal("18.00"), ciudad, categoria));
 
         // Email único para que no choque con la restricción UNIQUE si se repite el test
         Usuario usuario = new Usuario("Dani", "test" + System.currentTimeMillis() + "@erasmate.com", "1234");
