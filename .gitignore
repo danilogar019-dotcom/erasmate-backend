@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### draw.io (copias de seguridad) ###
+*.bkp
