@@ -97,7 +97,7 @@
         <mxCell id="IbcoP9FWqrJQwJDOVmEB-30" parent="1" style="ellipse;whiteSpace=wrap;html=1;align=center;" value="Nombre" vertex="1">
           <mxGeometry height="40" width="100" x="460" y="400" as="geometry" />
         </mxCell>
-        <mxCell id="IbcoP9FWqrJQwJDOVmEB-31" parent="1" style="ellipse;whiteSpace=wrap;html=1;align=center;" value="Precio_aproxi" vertex="1">
+        <mxCell id="IbcoP9FWqrJQwJDOVmEB-31" parent="1" style="ellipse;whiteSpace=wrap;html=1;align=center;" value="Precio_aprox" vertex="1">
           <mxGeometry height="40" width="100" x="480" y="160" as="geometry" />
         </mxCell>
         <mxCell id="IbcoP9FWqrJQwJDOVmEB-32" edge="1" parent="1" source="IbcoP9FWqrJQwJDOVmEB-1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.666;entryY=-0.005;entryDx=0;entryDy=0;entryPerimeter=0;shape=wire;" target="IbcoP9FWqrJQwJDOVmEB-28">
@@ -446,7 +446,7 @@
         <mxCell id="uml-5" value="Lugar" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;html=1;" vertex="1" parent="1">
           <mxGeometry as="geometry" x="420" y="60" width="250" height="194" />
         </mxCell>
-        <mxCell id="uml-6" value="- idLugar: Long&lt;br&gt;- nombre: String&lt;br&gt;- descripcion: String&lt;br&gt;- precioAprox: Double&lt;br&gt;- ciudad: Ciudad&lt;br&gt;- categoria: Categoria" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uml-5">
+        <mxCell id="uml-6" value="- idLugar: Long&lt;br&gt;- nombre: String&lt;br&gt;- descripcion: String&lt;br&gt;- precioAprox: BigDecimal&lt;br&gt;- ciudad: Ciudad&lt;br&gt;- categoria: Categoria" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="uml-5">
           <mxGeometry as="geometry" y="26" width="250" height="116" />
         </mxCell>
         <mxCell id="uml-7" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="uml-5">
