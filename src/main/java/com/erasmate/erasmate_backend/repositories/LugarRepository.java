@@ -2,7 +2,10 @@ package com.erasmate.erasmate_backend.repositories;
 
 import com.erasmate.erasmate_backend.models.Lugar;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface LugarRepository extends JpaRepository<Lugar, Long> {
@@ -22,4 +25,20 @@ public interface LugarRepository extends JpaRepository<Lugar, Long> {
 
     // SELECT * FROM lugar WHERE id_ciudad = ? AND id_categoria = ?
     List<Lugar> findByCiudad_IdCiudadAndCategoria_IdCategoria(Long idCiudad, Long idCategoria);
+
+    // Búsqueda con todos los filtros opcionales: si un parámetro llega null, ese filtro no se aplica.
+    // El texto se busca en el nombre o en la descripción, sin distinguir mayúsculas y minúsculas.
+    @Query("""
+        SELECT l FROM Lugar l
+        WHERE (:ciudad IS NULL OR l.ciudad.idCiudad = :ciudad)
+          AND (:categoria IS NULL OR l.categoria.idCategoria = :categoria)
+          AND (:texto IS NULL
+               OR LOWER(l.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+               OR LOWER(l.descripcion) LIKE LOWER(CONCAT('%', :texto, '%')))
+          AND (:precioMax IS NULL OR l.precioAprox <= :precioMax)
+        """)
+    List<Lugar> buscar(@Param("ciudad") Long ciudad,
+                       @Param("categoria") Long categoria,
+                       @Param("texto") String texto,
+                       @Param("precioMax") BigDecimal precioMax);
 }
