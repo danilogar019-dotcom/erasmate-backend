@@ -225,3 +225,9 @@ DELETE http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
 
 ### Comprobar que la lista vuelve a estar vacía
 GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+
+### Buscar lugares por texto y precio máximo
+GET http://localhost:8081/api/lugares?texto=playa&precioMax=10
+
+### Error: texto demasiado corto (debe devolver 400)
+GET http://localhost:8081/api/lugares?texto=a

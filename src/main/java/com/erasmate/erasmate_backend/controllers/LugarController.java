@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,23 +36,27 @@ public class LugarController {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // GET /api/lugares                      → todos
-    // GET /api/lugares?ciudad=3             → los de una ciudad
-    // GET /api/lugares?categoria=1          → los de una categoría
-    // GET /api/lugares?ciudad=3&categoria=1 → los de una ciudad y categoría
+    // GET /api/lugares                                       → todos
+    // GET /api/lugares?ciudad=3&categoria=1&texto=playa&precioMax=20 → con filtros
+    // Todos los parámetros son opcionales. Si alguno no es válido, devuelve 400 con {"error": "..."}
     @GetMapping
-    public List<Lugar> listar(@RequestParam(required = false) Long ciudad,
-                              @RequestParam(required = false) Long categoria) {
-        if (ciudad != null && categoria != null) {
-            return lugarRepository.findByCiudad_IdCiudadAndCategoria_IdCategoria(ciudad, categoria);
+    public ResponseEntity<?> listar(@RequestParam(required = false) Long ciudad,
+                                    @RequestParam(required = false) Long categoria,
+                                    @RequestParam(required = false) String texto,
+                                    @RequestParam(required = false) BigDecimal precioMax) {
+        // Validaciones en el servidor (por si alguien llama a la API sin pasar por el front)
+        if (texto != null) {
+            texto = texto.trim();
+            if (texto.isEmpty()) {
+                texto = null; // texto vacío = sin filtro de texto
+            } else if (texto.length() < 2 || texto.length() > 50) {
+                return error("La búsqueda debe tener entre 2 y 50 caracteres");
+            }
         }
-        if (ciudad != null) {
-            return lugarRepository.findByCiudad_IdCiudad(ciudad);
+        if (precioMax != null && precioMax.compareTo(BigDecimal.ZERO) < 0) {
+            return error("El precio máximo no puede ser negativo");
         }
-        if (categoria != null) {
-            return lugarRepository.findByCategoria_IdCategoria(categoria);
-        }
-        return lugarRepository.findAll();
+        return ResponseEntity.ok(lugarRepository.buscar(ciudad, categoria, texto, precioMax));
     }
 
     // GET /api/lugares/1 → uno por id (404 si no existe)
