@@ -1,5 +1,6 @@
 package com.erasmate.erasmate_backend.controllers;
 
+import com.erasmate.erasmate_backend.dto.FavoritosRequest;
 import com.erasmate.erasmate_backend.models.Lugar;
 import com.erasmate.erasmate_backend.models.Usuario;
 import com.erasmate.erasmate_backend.repositories.LugarRepository;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +19,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "http://localhost:5173") // permite las peticiones desde tu React (Vite)
+
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
@@ -81,6 +85,10 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Usuario o lugar no encontrado"));
         }
+        if (usuario.get().getFavoritos().contains(lugar.get())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "Ese lugar ya está en tus favoritos"));
+        }
         usuario.get().addFavorito(lugar.get());
         Usuario guardado = usuarioRepository.save(usuario.get());
         return ResponseEntity.ok(guardado.getFavoritos());
@@ -96,8 +104,55 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Usuario o lugar no encontrado"));
         }
+        if (!usuario.get().getFavoritos().contains(lugar.get())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Ese lugar no está en tus favoritos"));
+        }
         usuario.get().removeFavorito(lugar.get());
         usuarioRepository.save(usuario.get());
         return ResponseEntity.noContent().build();
+    }
+
+    // PUT /api/usuarios/1/favoritos → sustituye TODOS los favoritos del usuario por la lista recibida
+    // Body: {"idsLugares": [1, 3, 5]}   (lista vacía [] = dejar al usuario sin favoritos)
+    @PutMapping("/{id}/favoritos")
+    public ResponseEntity<?> sustituirFavoritos(@PathVariable Long id, @RequestBody FavoritosRequest datos) {
+        Optional<Usuario> usuario = usuarioRepository.findById(id);
+        if (usuario.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Usuario no encontrado"));
+        }
+
+        // Validaciones de los datos recibidos
+        if (datos == null || datos.idsLugares() == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Falta la lista idsLugares"));
+        }
+        List<Long> ids = datos.idsLugares();
+        if (ids.size() > 50) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "No se pueden guardar más de 50 favoritos"));
+        }
+        if (ids.contains(null)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "La lista contiene ids vacíos"));
+        }
+        if (new HashSet<>(ids).size() != ids.size()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "La lista tiene lugares repetidos"));
+        }
+
+        // Todos los lugares tienen que existir
+        List<Lugar> lugares = lugarRepository.findAllById(ids);
+        if (lugares.size() != ids.size()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Algún lugar de la lista no existe"));
+        }
+
+        // Sustituyo la lista entera: Hibernate borra las filas viejas de "favorito" e inserta las nuevas
+        usuario.get().getFavoritos().clear();
+        lugares.forEach(lugar -> usuario.get().addFavorito(lugar));
+        Usuario guardado = usuarioRepository.save(usuario.get());
+        return ResponseEntity.ok(guardado.getFavoritos());
     }
 }
