@@ -159,6 +159,8 @@ Content-Type: application/json
 
 {"email": "{{emailUsuario}}", "password": "1234"}
 
+> {% client.global.set("token", response.body.token); %}
+
 ### Login con contraseña incorrecta (debe dar 401)
 POST http://localhost:8081/api/usuarios/login
 Content-Type: application/json
@@ -173,6 +175,7 @@ Content-Type: application/json
 
 ### Obtener el usuario (la contraseña no debe aparecer)
 GET http://localhost:8081/api/usuarios/{{idUsuario}}
+Authorization: Bearer {{token}}
 
 ###############################################
 # FAVORITOS (relación N:M) — ejecutar después de USUARIOS
@@ -210,63 +213,91 @@ Content-Type: application/json
 
 ### Añadir el lugar a favoritos del usuario
 POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+Authorization: Bearer {{token}}
 
 ### Listar favoritos del usuario (debe salir el Louvre)
 GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 
 ### Añadirlo otra vez (debe dar 409, ya está en favoritos)
 POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+Authorization: Bearer {{token}}
 
 ### Añadir un lugar que no existe (debe dar 404)
 POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/99999
+Authorization: Bearer {{token}}
 
 ### Quitar el lugar de favoritos
 DELETE http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+Authorization: Bearer {{token}}
 
 ### Comprobar que la lista vuelve a estar vacía
 GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 
 ### PUT: sustituir los favoritos por una lista (debe dar 200 con el Louvre)
 PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {"idsLugares": [{{idLugar}}]}
 
 ### PUT: lista vacía, deja al usuario sin favoritos (debe dar 200 con [])
 PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {"idsLugares": []}
 
 ### PUT error: falta la lista (debe dar 400)
 PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {}
 
 ### PUT error: lugares repetidos (debe dar 400)
 PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {"idsLugares": [{{idLugar}}, {{idLugar}}]}
 
 ### PUT error: un lugar que no existe (debe dar 400)
 PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {"idsLugares": [99999]}
 
-### PUT error: usuario que no existe (debe dar 404)
+### PUT error: favoritos de otro usuario (debe dar 403, el token es de otro usuario)
 PUT http://localhost:8081/api/usuarios/99999/favoritos
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {"idsLugares": [{{idLugar}}]}
 
 ### DELETE error: quitar un lugar que no está en favoritos (debe dar 404)
 DELETE http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
+Authorization: Bearer {{token}}
 
 ### Buscar lugares por texto y precio máximo
 GET http://localhost:8081/api/lugares?texto=playa&precioMax=10
 
 ### Error: texto demasiado corto (debe devolver 400)
 GET http://localhost:8081/api/lugares?texto=a
+
+###############################################
+# SEGURIDAD JWT (ejecutar después de "Login correcto")
+###############################################
+
+### Favoritos sin token (debe dar 401: "Debes iniciar sesión.")
+GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+
+### Favoritos con un token falso (debe dar 401: "Sesión no válida")
+GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Authorization: Bearer token.falso.inventado
+
+### Datos de otro usuario con mi token (debe dar 403)
+GET http://localhost:8081/api/usuarios/1
+Authorization: Bearer {{token}}

@@ -5,6 +5,7 @@ import com.erasmate.erasmate_backend.models.Lugar;
 import com.erasmate.erasmate_backend.models.Usuario;
 import com.erasmate.erasmate_backend.repositories.LugarRepository;
 import com.erasmate.erasmate_backend.repositories.UsuarioRepository;
+import com.erasmate.erasmate_backend.seguridad.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,12 +26,14 @@ public class UsuarioController {
     private final UsuarioRepository usuarioRepository;
     private final LugarRepository lugarRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public UsuarioController(UsuarioRepository usuarioRepository, LugarRepository lugarRepository,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.usuarioRepository = usuarioRepository;
         this.lugarRepository = lugarRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     // POST /api/usuarios → registro (409 si el email ya está registrado)
@@ -54,7 +57,9 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Email o contraseña incorrectos"));
         }
-        return ResponseEntity.ok(usuario.get());
+        // Login correcto: devuelvo el token y los datos del usuario
+        String token = jwtUtil.generarToken(usuario.get());
+        return ResponseEntity.ok(Map.of("token", token, "usuario", usuario.get()));
     }
 
     // GET /api/usuarios/1 → datos de un usuario con sus favoritos (404 si no existe)
