@@ -214,7 +214,7 @@ POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
 ### Listar favoritos del usuario (debe salir el Louvre)
 GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
 
-### Añadirlo otra vez (no se duplica gracias al Set y a la PK compuesta)
+### Añadirlo otra vez (debe dar 409, ya está en favoritos)
 POST http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
 
 ### Añadir un lugar que no existe (debe dar 404)
@@ -225,6 +225,45 @@ DELETE http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
 
 ### Comprobar que la lista vuelve a estar vacía
 GET http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+
+### PUT: sustituir los favoritos por una lista (debe dar 200 con el Louvre)
+PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Content-Type: application/json
+
+{"idsLugares": [{{idLugar}}]}
+
+### PUT: lista vacía, deja al usuario sin favoritos (debe dar 200 con [])
+PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Content-Type: application/json
+
+{"idsLugares": []}
+
+### PUT error: falta la lista (debe dar 400)
+PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Content-Type: application/json
+
+{}
+
+### PUT error: lugares repetidos (debe dar 400)
+PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Content-Type: application/json
+
+{"idsLugares": [{{idLugar}}, {{idLugar}}]}
+
+### PUT error: un lugar que no existe (debe dar 400)
+PUT http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos
+Content-Type: application/json
+
+{"idsLugares": [99999]}
+
+### PUT error: usuario que no existe (debe dar 404)
+PUT http://localhost:8081/api/usuarios/99999/favoritos
+Content-Type: application/json
+
+{"idsLugares": [{{idLugar}}]}
+
+### DELETE error: quitar un lugar que no está en favoritos (debe dar 404)
+DELETE http://localhost:8081/api/usuarios/{{idUsuario}}/favoritos/{{idLugar}}
 
 ### Buscar lugares por texto y precio máximo
 GET http://localhost:8081/api/lugares?texto=playa&precioMax=10
